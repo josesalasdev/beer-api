@@ -1,0 +1,37 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=username
+      - POSTGRES_DB=beers
+      - POSTGRES_PORT=5432
+    volumes:
+      - my-db:/var/lib/postgresql
+    ports:
+      - '5432:5432'
+
+  app:
+    container_name: go_api
+    build: .
+    ports:
+      - 8080:8080
+    restart: on-failure
+    environment:
+      - PORT=8080
+      - GIN_MODE=debug
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=username
+      - POSTGRES_DB=beers
+      - POSTGRES_HOSTNAME=db
+      - POSTGRES_PORT=5432
+    volumes:
+      - .:/cmd/api
+    depends_on:
+      - db
+
+volumes:
+  my-db:
