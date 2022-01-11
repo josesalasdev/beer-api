@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/josesalasdev/beer-api/cmd/api/clients"
 	"github.com/josesalasdev/beer-api/cmd/api/config"
 	"github.com/josesalasdev/beer-api/cmd/api/controllers"
 )
@@ -14,6 +15,8 @@ import (
 // @license.url https://opensource.org/licenses/MIT
 func main() {
 	r := gin.Default()
+
+	clients.ConnectDataBase()
 
 	// routes
 	r.GET("/v1/ping", controllers.Ping)
