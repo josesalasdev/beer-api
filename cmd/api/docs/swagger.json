@@ -1,0 +1,165 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "paths": {
+        "/v1/beers": {
+            "get": {
+                "description": "You can list beers.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List beers.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BeerItem"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "You can create beer.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create beers.",
+                "parameters": [
+                    {
+                        "description": "Create beers",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BeerItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.BeerItem"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/beers/{beerID}": {
+            "get": {
+                "description": "You can Calculate Beer Boxes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Calculate Beer Box.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BeerBox"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/ping/": {
+            "get": {
+                "description": "Health API.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Health API.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.pingMessage"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.pingMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BeerBox": {
+            "type": "object",
+            "properties": {
+                "price_total": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.BeerItem": {
+            "type": "object",
+            "required": [
+                "brewery",
+                "country",
+                "currency",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "brewery": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "delete_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "update_at": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
