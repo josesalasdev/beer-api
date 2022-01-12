@@ -19,3 +19,10 @@ var PostgresPassword = os.Getenv("POSTGRES_PASSWORD")
 
 // PostgresPort Postgres config.
 var PostgresPort = os.Getenv("POSTGRES_PORT")
+
+// CurrencyAPISecret config.
+var CurrencyAPISecret = os.Getenv("CURRENCY_API_SECRET")
+
+// Currency API path version free
+// Docs https://currencylayer.com/documentation
+const CurrencyPath = "http://apilayer.net/api/live"

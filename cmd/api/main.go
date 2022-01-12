@@ -18,14 +18,17 @@ func main() {
 
 	clients.ConnectDataBase()
 
+	currencyService := clients.NewCurrencyClient()
+	beerController := controllers.NewBeerController(currencyService)
+
 	// routes
 	r.GET("/v1/ping", controllers.Ping)
 	apiBeer := r.Group("/v1/beers")
 	{
-		apiBeer.POST("/", controllers.CreateBeer)
-		apiBeer.GET("/", controllers.ListBeer)
-		apiBeer.GET("/:id", controllers.RetrieveBeer)
-		apiBeer.GET("/:id/:boxprice", controllers.CalculateBeerBox)
+		apiBeer.POST("/", beerController.CreateBeer)
+		apiBeer.GET("/", beerController.ListBeer)
+		apiBeer.GET("/:id", beerController.RetrieveBeer)
+		apiBeer.GET("/:id/boxprice", beerController.CalculateBeerBox)
 	}
 
 	r.Run(config.Port) // nolint

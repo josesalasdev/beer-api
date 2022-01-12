@@ -5,6 +5,8 @@ Challenge beer API
 ## Run project 🚀
 
 ```bash
+export CURRENCY_API_SECRET=YourKeySecret
+export POSTGRES_PASSWORD=password
 Docker-compose up
 ```
 
