@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/josesalasdev/beer-api/cmd/api/config"
+	"github.com/josesalasdev/beer-api/cmd/api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -28,7 +29,7 @@ func ConnectDataBase() {
 		panic(dsn)
 	}
 
-	//db.AutoMigrate(&Model{})     // nolint
+	db.AutoMigrate(&models.BeerItem{}) // nolint
 
 	DB = db
 }
