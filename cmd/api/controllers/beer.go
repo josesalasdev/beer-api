@@ -2,11 +2,32 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/josesalasdev/beer-api/cmd/api/clients"
 	"github.com/josesalasdev/beer-api/cmd/api/models"
+	"gorm.io/gorm"
 )
+
+type BeerController interface {
+	ListBeer(c *gin.Context)
+	CreateBeer(c *gin.Context)
+	RetrieveBeer(c *gin.Context)
+	CalculateBeerBox(c *gin.Context)
+}
+
+type beerController struct {
+	currencyService clients.Currency
+	DB              *gorm.DB
+}
+
+func NewBeerController(currencyService clients.Currency, DB *gorm.DB) BeerController {
+	return &beerController{
+		currencyService: currencyService,
+		DB:              DB,
+	}
+}
 
 // List beers controller.
 // @Summary List beers.
@@ -15,9 +36,9 @@ import (
 // @Produce  json
 // @Success 200 {object} []models.BeerItem
 // @Router /v1/beers [get]
-func ListBeer(c *gin.Context) {
+func (cntl *beerController) ListBeer(c *gin.Context) {
 	var beers []models.BeerItem
-	clients.DB.Find(&beers)
+	cntl.DB.Find(&beers)
 
 	c.JSON(http.StatusOK, beers)
 }
@@ -30,14 +51,14 @@ func ListBeer(c *gin.Context) {
 // @Param body body models.BeerItem true "Create beers"
 // @Success 201 {object} models.BeerItem
 // @Router /v1/beers [post]
-func CreateBeer(c *gin.Context) {
+func (cntl *beerController) CreateBeer(c *gin.Context) {
 	// Validate input
 	var beerItem models.BeerItem
 	if err := c.ShouldBindJSON(&beerItem); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	clients.DB.Create(&beerItem)
+	cntl.DB.Create(&beerItem)
 
 	c.JSON(http.StatusCreated, beerItem)
 }
@@ -50,9 +71,9 @@ func CreateBeer(c *gin.Context) {
 // @Param beerID path int true "Beer ID"
 // @Success 200 {object} models.BeerItem
 // @Router /v1/beers/{beerID} [get]
-func RetrieveBeer(c *gin.Context) {
+func (cntl *beerController) RetrieveBeer(c *gin.Context) {
 	var beer models.BeerItem
-	if err := clients.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
+	if err := cntl.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Beer not found!"})
 		return
 	}
@@ -66,13 +87,24 @@ func RetrieveBeer(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} models.BeerBox
-// @Router /v1/beers/{beerID} [get]
-func CalculateBeerBox(c *gin.Context) {
+// @Router /v1/beers/{beerID}/boxprice [get]
+func (cntl *beerController) CalculateBeerBox(c *gin.Context) {
 	var beer models.BeerItem
-	if err := clients.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Beer not found!"})
+	if err := cntl.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Beer not found!"})
 		return
 	}
+	quantity, err := strconv.ParseFloat(c.Query("quantity"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "quantity param is required!"})
+		return
+	}
+	currencyTo := c.Query("currency")
 
-	c.JSON(http.StatusOK, beer)
+	total, err := cntl.currencyService.Calculate(beer.Price, quantity, beer.Currency, currencyTo)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error to calculate currencies!"})
+		return
+	}
+	c.JSON(http.StatusOK, models.BeerBox{PriceTotal: total})
 }
