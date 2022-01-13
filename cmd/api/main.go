@@ -16,10 +16,10 @@ import (
 func main() {
 	r := gin.Default()
 
-	clients.ConnectDataBase()
+	DB := clients.NewConnectDataBase()
 
 	currencyService := clients.NewCurrencyClient()
-	beerController := controllers.NewBeerController(currencyService)
+	beerController := controllers.NewBeerController(currencyService, DB)
 
 	// routes
 	r.GET("/v1/ping", controllers.Ping)

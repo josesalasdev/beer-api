@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/josesalasdev/beer-api/cmd/api/clients"
 	"github.com/josesalasdev/beer-api/cmd/api/models"
+	"gorm.io/gorm"
 )
 
 type BeerController interface {
@@ -18,11 +19,13 @@ type BeerController interface {
 
 type beerController struct {
 	currencyService clients.Currency
+	DB              *gorm.DB
 }
 
-func NewBeerController(currencyService clients.Currency) BeerController {
+func NewBeerController(currencyService clients.Currency, DB *gorm.DB) BeerController {
 	return &beerController{
 		currencyService: currencyService,
+		DB:              DB,
 	}
 }
 
@@ -35,7 +38,7 @@ func NewBeerController(currencyService clients.Currency) BeerController {
 // @Router /v1/beers [get]
 func (cntl *beerController) ListBeer(c *gin.Context) {
 	var beers []models.BeerItem
-	clients.DB.Find(&beers)
+	cntl.DB.Find(&beers)
 
 	c.JSON(http.StatusOK, beers)
 }
@@ -55,7 +58,7 @@ func (cntl *beerController) CreateBeer(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	clients.DB.Create(&beerItem)
+	cntl.DB.Create(&beerItem)
 
 	c.JSON(http.StatusCreated, beerItem)
 }
@@ -70,7 +73,7 @@ func (cntl *beerController) CreateBeer(c *gin.Context) {
 // @Router /v1/beers/{beerID} [get]
 func (cntl *beerController) RetrieveBeer(c *gin.Context) {
 	var beer models.BeerItem
-	if err := clients.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
+	if err := cntl.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Beer not found!"})
 		return
 	}
@@ -87,7 +90,7 @@ func (cntl *beerController) RetrieveBeer(c *gin.Context) {
 // @Router /v1/beers/{beerID}/boxprice [get]
 func (cntl *beerController) CalculateBeerBox(c *gin.Context) {
 	var beer models.BeerItem
-	if err := clients.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
+	if err := cntl.DB.Where("id = ?", c.Param("id")).First(&beer).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Beer not found!"})
 		return
 	}
