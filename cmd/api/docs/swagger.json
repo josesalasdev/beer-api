@@ -1,11 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {
-            "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
-        },
+        "contact": {},
         "license": {
             "name": "MIT License",
             "url": "https://opensource.org/licenses/MIT"
@@ -65,6 +61,35 @@
             }
         },
         "/v1/beers/{beerID}": {
+            "get": {
+                "description": "You can retrieve a beer.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Retrieve a beer.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Beer ID",
+                        "name": "beerID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BeerItem"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/beers/{beerID}/boxprice": {
             "get": {
                 "description": "You can Calculate Beer Boxes.",
                 "consumes": [

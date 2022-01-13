@@ -11,8 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// NewConnectDataBase return connection
-func NewConnectDataBase() *gorm.DB {
+var DB *gorm.DB
+
+func ConnectDataBase() {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Bogota",
 		config.PostgresHostName,
@@ -27,5 +28,10 @@ func NewConnectDataBase() *gorm.DB {
 	}
 
 	db.AutoMigrate(&models.BeerItem{}) // nolint
-	return db
+	DB = db
+}
+
+// NewConnectDataBase return connection
+func NewConnectDataBase() *gorm.DB {
+	return DB
 }
